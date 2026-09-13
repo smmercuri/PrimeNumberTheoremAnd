@@ -1,19 +1,23 @@
-import Mathlib.Algebra.Order.Field.Pointwise
-import Mathlib.Algebra.Order.Ring.Star
-import Mathlib.Analysis.Complex.PhragmenLindelof
-import Mathlib.Analysis.CStarAlgebra.Classes
-import Mathlib.Analysis.SpecialFunctions.Trigonometric.Basic
-import Mathlib.Analysis.SpecialFunctions.Trigonometric.DerivHyp
-import Mathlib.Analysis.SpecialFunctions.Trigonometric.Complex
-import Mathlib.Analysis.SpecialFunctions.Trigonometric.Meromorphic
-import Mathlib.Data.Int.Star
-import Mathlib.Data.PNat.Interval
-import Mathlib.Data.Real.Sign
-import Mathlib.Algebra.Order.Star.Real
-import Mathlib.RingTheory.SimpleRing.Principal
-import PrimeNumberTheoremAnd.IEANTN.PrimaryDefinitions
-import PrimeNumberTheoremAnd.Wiener
-import PrimeNumberTheoremAnd.ResidueCalcOnRectangles
+module
+
+public import Mathlib.Algebra.Order.Field.Pointwise
+public import Mathlib.Algebra.Order.Ring.Star
+public import Mathlib.Analysis.Complex.PhragmenLindelof
+public import Mathlib.Analysis.CStarAlgebra.Classes
+public import Mathlib.Analysis.SpecialFunctions.Trigonometric.Basic
+public import Mathlib.Analysis.SpecialFunctions.Trigonometric.DerivHyp
+public import Mathlib.Analysis.SpecialFunctions.Trigonometric.Complex
+public import Mathlib.Analysis.SpecialFunctions.Trigonometric.Meromorphic
+public import Mathlib.Data.Int.Star
+public import Mathlib.Data.PNat.Interval
+public import Mathlib.Data.Real.Sign
+public import Mathlib.Algebra.Order.Star.Real
+public import Mathlib.RingTheory.SimpleRing.Principal
+public import PrimeNumberTheoremAnd.IEANTN.PrimaryDefinitions
+public import PrimeNumberTheoremAnd.Wiener
+public import PrimeNumberTheoremAnd.ResidueCalcOnRectangles
+
+@[expose] public section
 
 open Real
 
@@ -2000,11 +2004,7 @@ lemma h_B_rational (ε : ℝ) : ∀ w : ℂ, w ≠ 0 → B ε w = w * (Complex.c
 
 lemma h_comp (ε ν : ℝ) (hlam : ν ≠ 0) : ContDiff ℝ 2 (fun t : ℝ => (-2 * Real.pi * Complex.I * t + ν) * (Complex.cosh ((-2 * Real.pi * Complex.I * t + ν) / 2) / Complex.sinh ((-2 * Real.pi * Complex.I * t + ν) / 2) + ε) / 2) := by
   apply_rules [ContDiff.div, ContDiff.mul, ContDiff.add, contDiff_const, contDiff_id] <;> try fun_prop
-  · exact Complex.conjCLE.contDiff.comp (by fun_prop)
-  · refine Complex.ofRealCLM.contDiff.comp ?_
-    refine ContDiff.inv (by fun_prop) ?_
-    intro x; rw [ne_eq, Complex.normSq_eq_zero]
-    exact sinh_ne_zero_of_re_ne_zero (by simp [hlam])
+  · exact ContDiff.inv (by fun_prop) fun x ↦ sinh_ne_zero_of_re_ne_zero (by simp [hlam])
 
 theorem Phi_star.contDiff_real (ν ε : ℝ) (hlam : ν ≠ 0) :
     ContDiff ℝ 2 (fun (t : ℝ) ↦ Phi_star ν ε (t : ℂ)) := by
@@ -2397,6 +2397,7 @@ theorem ϕ_circ_bound_right (ν₀ ν₁ ε c : ℝ) (hc : c > -ν₀ / (2 * π)
         _ ≤ ‖Complex.tanh u‖ := by
             rw [← Real.sqrt_sq (div_nonneg (Real.sinh_nonneg_iff.mpr
               (hκ.le.trans hu)) (Real.cosh_pos _ |>.le))]
+            rw [Complex.norm_def]
             exact Real.sqrt_le_sqrt (by rw [Complex.sq_norm] at htanh_sq; exact htanh_sq)
   use (1 / 2) * ((Real.tanh κ)⁻¹ + |ε|)
   intros ν hν z hz

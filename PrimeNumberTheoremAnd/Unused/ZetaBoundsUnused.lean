@@ -1,4 +1,8 @@
-import PrimeNumberTheoremAnd.ZetaBounds
+module
+
+public import PrimeNumberTheoremAnd.ZetaBounds
+
+public section
 
 open Complex Filter Set
 local notation (name := riemannzeta2) "ζ" => riemannZeta
