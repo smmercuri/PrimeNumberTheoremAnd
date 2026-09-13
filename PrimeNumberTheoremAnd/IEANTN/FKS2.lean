@@ -766,7 +766,9 @@ lemma BKLNW_a1_le_two_of_ge_1000 (t : ℝ) (ht : t ≥ 1000) :
           (b₀ := 20) (ε := 4.2676e-5) BKLNW_app.table_8_mem_20 h20
       simp [hif]
       linarith
-  simpa [BKLNW.a₁, BKLNW.Inputs.a₁, BKLNW.Inputs.default, BKLNW.Pre_inputs.default] using hmain
+  by_cases hif : t ≤ 2 * log (1e19 : ℝ) <;>
+    simpa [BKLNW.a₁, BKLNW.Inputs.a₁, BKLNW.Inputs.default, BKLNW.Pre_inputs.default, hif]
+      using hmain
 
 /--
 A crude linear bound on `BKLNW.a₂` at large `t`.
@@ -1433,7 +1435,7 @@ private lemma bklnw_a1_30_le : BKLNW.a₁ 30 ≤ 1 + 1.9339e-8 := by
   have htable : BKLNW_app.table_8_ε (Real.log (1e19)) ≤ 1.9339e-8 :=
     BKLNW_app.table_8_ε_le_of_row BKLNW_app.table_8_mem_40 h40
   have hgoal : 1 + BKLNW_app.table_8_ε (Real.log (1e19)) ≤ 1 + 1.9339e-8 := by linarith
-  simpa [BKLNW.Inputs.default, BKLNW.Pre_inputs.default, if_pos hif] using hgoal
+  simpa [BKLNW.Inputs.default, BKLNW.Pre_inputs.default, hif] using hgoal
 
 -- Helper bounding BKLNW.f (exp 30).
 private lemma bklnw_f_exp30_le : BKLNW.f (Real.exp 30) ≤ 41 := by
@@ -3490,7 +3492,7 @@ lemma exists_larger_than_boundary_val {x₁ : ℝ} (h : x₁ ≥ 14) :
     Filter.Eventually.filter_mono (nhdsWithin_mono (x₁ * log x₁) (fun _ h ↦ ne_of_gt h))
       (Filter.Tendsto.eventually_const_lt h_deriv h_tendsto)
   have h_exists : ∃ t > x₁ * log x₁, slope (fun t ↦ (log t / t) * ∫ s in x₁..t, 1 / (log s) ^ 2) (x₁ * log x₁) t > 0 := by
-    haveI : Filter.NeBot (nhdsWithin (x₁ * log x₁) {x | (fun x ↦ x > x₁ * log x₁) x}) := nhdsWithin_Ioi_neBot le_rfl
+    have : Filter.NeBot (nhdsWithin (x₁ * log x₁) {x | (fun x ↦ x > x₁ * log x₁) x}) := nhdsWithin_Ioi_neBot le_rfl
     exact Filter.Eventually.exists (Filter.Eventually.and self_mem_nhdsWithin h_slope_pos)
   obtain ⟨t, ht_gt, ht_slope⟩ := h_exists
   have h_val : (log t / t) * ∫ s in x₁..t, 1 / (log s) ^ 2 >

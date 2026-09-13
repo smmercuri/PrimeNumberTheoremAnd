@@ -1687,8 +1687,9 @@ lemma Params.initial_balance_eq (P : Params) (p : ℕ) :
 lemma Params.exists_large_prime_of_rough (P : Params) (m : ℕ) (hm : m ∈ rough_set P) :
     ∃ q, q.Prime ∧ q ≥ P.n / P.L ∧ q ∣ m := by
   unfold rough_set at hm
+  rw [Finset.mem_filter] at hm
   by_cases hq : m = 0 <;> simp_all only [smoothNumbers, ne_eq, mem_primeFactorsList', and_imp,
-    Set.mem_setOf_eq, not_and, not_forall, not_lt, Finset.mem_filter]
+    Set.mem_ofPred_eq, not_and, not_forall, not_lt]
   · have := Nat.exists_infinite_primes (P.n / P.L)
     aesop
   · tauto
