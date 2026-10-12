@@ -10,6 +10,7 @@ public import Mathlib.Algebra.Order.Star.Real
 public import Mathlib.RingTheory.SimpleRing.Principal
 public import Mathlib.Analysis.Complex.BorelCaratheodory
 public import PrimeNumberTheoremAnd.MediumPNT
+public import PrimeNumberTheoremAnd.BorelCaratheodory
 
 @[expose] public section
 
@@ -28,35 +29,6 @@ local notation "ζ'" => deriv ζ
 local notation "ψ" => ChebyshevPsi
 
 --open scoped ArithmeticFunction
-
-
-
-@[blueprint "AnalyticOn.norm_le_of_norm_le_on_sphere"
-  (title := "AnalyticOn.norm-le-of-norm-le-on-sphere")
-  (statement := /--
-    An application of the Maximum modulus principle.
-  -/)
-  (proof := /--
-    This is standard in the literature.
-  -/)
-  (latexEnv := "lemma")]
-lemma AnalyticOn.norm_le_of_norm_le_on_sphere {C r R : ℝ} {f : ℂ → ℂ} {w : ℂ}
-    (hyp_r : r ≤ R)
-    (analytic : AnalyticOn ℂ f (Metric.closedBall 0 R))
-    (cond : ∀ z ∈ Metric.sphere 0 r, ‖f z‖ ≤ C)
-    (wInS : w ∈ Metric.closedBall 0 r) :
-    ‖f w‖ ≤ C := by
-  apply Complex.norm_le_of_forall_mem_frontier_norm_le
-    (U := Metric.closedBall 0 r) Metric.isBounded_closedBall
-  · apply DifferentiableOn.diffContOnCl
-    rw [Metric.closure_closedBall]
-    exact AnalyticOn.differentiableOn
-      (AnalyticOn.mono analytic
-        (Metric.closedBall_subset_closedBall hyp_r))
-  · rw [frontier_closedBall']
-    exact cond
-  · rw [Metric.closure_closedBall]
-    exact wInS
 
 
 
