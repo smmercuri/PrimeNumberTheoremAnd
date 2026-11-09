@@ -2547,10 +2547,10 @@ theorem psi_le_bound_large (y : ℝ) (hy : 1e19 < y) :
     grw [BKLNW_app.table_8_ε.le_simp (19 * log 10) (by grind)]
     norm_num [BKLNW_app.table_8_ε', h_log_approx]; norm_num at *
     field_simp
-    rw [if_neg (by linarith), if_neg (by linarith), if_neg (by linarith),
-        if_neg (by linarith), if_neg (by linarith), if_neg (by linarith),
-        if_neg (by linarith), if_neg (by linarith), if_neg (by linarith),
-        if_pos (by linarith)]
+    rw [ite_eq_right (by linarith), ite_eq_right (by linarith), ite_eq_right (by linarith),
+        ite_eq_right (by linarith), ite_eq_right (by linarith), ite_eq_right (by linarith),
+        ite_eq_right (by linarith), ite_eq_right (by linarith), ite_eq_right (by linarith),
+        ite_eq_left (by linarith)]
     norm_num [log_pos] at *
   norm_num [← sqrt_eq_rpow] at *
   nlinarith [abs_le.mp h_b, sqrt_nonneg y, sq_sqrt (show 0 ≤ y by linarith), h_eps]

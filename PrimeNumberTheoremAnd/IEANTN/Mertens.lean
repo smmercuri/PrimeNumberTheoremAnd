@@ -1,6 +1,7 @@
 module
 
 public import Mathlib.Algebra.Order.Field.GeomSum
+public import Mathlib.Algebra.Order.Floor.Semifield
 public import Mathlib.Analysis.SumIntegralComparisons
 public import Mathlib.NumberTheory.Chebyshev
 public import Mathlib.NumberTheory.Harmonic.EulerMascheroni
@@ -9,7 +10,8 @@ public import Mathlib.NumberTheory.LSeries.RiemannZeta
 public import Mathlib.NumberTheory.Harmonic.GammaDeriv
 public import Mathlib.Analysis.Asymptotics.Lemmas
 public import Mathlib.Analysis.SpecialFunctions.Complex.Analytic
-public import Mathlib.Analysis.SpecialFunctions.Integrability.LogMeromorphic
+public import Mathlib.Analysis.SpecialFunctions.Integrability.Log
+public import Mathlib.Analysis.SpecialFunctions.Log.Sum
 public import Mathlib.NumberTheory.EulerProduct.DirichletLSeries
 public import Mathlib.NumberTheory.EulerProduct.ExpLog
 public import Mathlib.Analysis.SpecialFunctions.Complex.LogBounds
@@ -353,17 +355,8 @@ $$ \sum_{n \leq x} \log n \leq x \log x.$$
   (latexEnv := "lemma")
   (discussion := 1304)]
 theorem sum_log_le {x : ℝ} (hx : 1 ≤ x) :
-    ∑ n ∈ Ioc 0 ⌊ x ⌋₊, log n ≤ x * log x := by
-  calc
-  _ ≤ ∑ n ∈ Ioc 0 ⌊ x ⌋₊, log x := by
-    refine sum_le_sum fun n hn ↦ ?_
-    simp only [mem_Ioc] at hn
-    exact log_le_log (by exact_mod_cast hn.1) (Nat.le_floor_iff (by linarith)|>.mp hn.2)
-  _ = ⌊x⌋₊ * log x := by simp
-  _ ≤ _ := by
-    gcongr
-    · exact log_nonneg hx
-    · exact Nat.floor_le (by linarith)
+    ∑ n ∈ Ioc 0 ⌊ x ⌋₊, log n ≤ x * log x :=
+  Real.sum_log_le' hx
 
 
 lemma integral_log_le {a b : ℝ} (ha : 1 ≤ a) (hab : a ≤ b) :
@@ -436,11 +429,8 @@ $$ \sum_{n \leq x} \log n = \log(\lfloor x \rfloor!). $$
   (latexEnv := "proposition")
   (discussion := 1315)]
 theorem sum_log_eq_log_factorial (x : ℝ) :
-    ∑ n ∈ Ioc 0 ⌊ x ⌋₊, log n = log (Nat.floor x).factorial := by
-    rw [←prod_Ico_id_eq_factorial, ←log_prod, prod_natCast]
-    · congr
-    intro x hx
-    simp at hx ⊢; grind
+    ∑ n ∈ Ioc 0 ⌊ x ⌋₊, log n = log (Nat.floor x).factorial :=
+  Real.sum_log_eq_log_factorial _
 
 @[blueprint
   "Mertens-sum-log-eq-sum-mangoldt"
@@ -1404,7 +1394,7 @@ theorem log_zeta_eq_integ_aux (s : ℝ) (hs : 1 < s) :
         (volume.restrict (Set.Ioi (1:ℝ)))
       ↔ MeasureTheory.IntegrableOn ((Set.Ici (d:ℝ)).indicator fun x => x ^ (-s))
           (Set.Ioi (1:ℝ)) volume from Iff.rfl,
-      MeasureTheory.integrableOn_indicator_iff measurableSet_Ici]
+      MeasureTheory.integrableOn_indicator_iff measurableSet_Ici.nullMeasurableSet]
     apply MeasureTheory.IntegrableOn.mono_set
       (integrableOn_Ioi_rpow_of_lt (by linarith : (-s:ℝ) < -1) (by norm_num : (0:ℝ) < 1/2))
     intro x hx
@@ -1514,54 +1504,6 @@ private theorem integrableOn_Ioi_mul_rpow_neg_of_abs_le
         mul_le_mul_of_nonneg_right (hbound x hx) hxs.le
     _ = B * x ^ (a - s) := by rw [mul_assoc, ← Real.rpow_add hxpos, sub_eq_add_neg]
 
-/-- `log (log x) * x ^ (-s)` is integrable on `Ioi 1` for `s > 1`
-(log-log singularity at `1` is integrable; `x^(-s)` gives decay). -/
-private theorem integrableOn_log_log_mul_rpow (s : ℝ) (hs : 1 < s) :
-    MeasureTheory.IntegrableOn (fun x => log (log x) * x ^ (-s)) (Set.Ioi 1) := by
-  rw [← Set.Ioc_union_Ioi_eq_Ioi (by norm_num : (1:ℝ) ≤ 2)]
-  apply MeasureTheory.IntegrableOn.union
-  · -- Near `1`: `log (log x)` is integrable (log-log singularity) and `x^(-s) ≤ 1`.
-    have hll : MeasureTheory.IntegrableOn (fun x => log (log x)) (Set.Ioc 1 2) := by
-      have h : IntervalIntegrable (log ∘ log) MeasureTheory.volume 1 2 := by
-        apply MeromorphicOn.intervalIntegrable_log
-        intro x hx
-        rw [Set.uIcc_of_le (by norm_num : (1:ℝ) ≤ 2)] at hx
-        exact (analyticAt_log (by linarith [hx.1] : 0 < x)).meromorphicAt
-      exact (intervalIntegrable_iff_integrableOn_Ioc_of_le (by norm_num)).mp h
-    have hmul : MeasureTheory.IntegrableOn (fun x => x ^ (-s) * log (log x)) (Set.Ioc 1 2) := by
-      apply hll.bdd_mul (c := 1)
-      · fun_prop
-      · filter_upwards [MeasureTheory.ae_restrict_mem measurableSet_Ioc] with x hx
-        rw [norm_eq_abs, abs_of_nonneg (Real.rpow_nonneg (by linarith [hx.1] : (0:ℝ) ≤ x) _)]
-        calc x ^ (-s) ≤ (1:ℝ) ^ (-s) :=
-              Real.rpow_le_rpow_of_nonpos (by norm_num) hx.1.le (by linarith)
-          _ = 1 := Real.one_rpow _
-    simpa [mul_comm] using hmul
-  · -- Tail (`Ioi 2`): `|log (log x)| ≤ (1/ε + |log (log 2)|)·x^ε` with `ε = (s-1)/2`, `ε + 1 < s`.
-    set ε := (s - 1) / 2 with hε
-    have hεpos : 0 < ε := by rw [hε]; linarith
-    refine integrableOn_Ioi_mul_rpow_neg_of_abs_le (a := ε) (B := 1 / ε + |log (log 2)|)
-      (by norm_num) (by rw [hε]; linarith) (Real.measurable_log.comp Real.measurable_log) ?_
-    intro x hx
-    simp only [Set.mem_Ioi] at hx
-    have hx1 : (1:ℝ) ≤ x ^ ε := Real.one_le_rpow (by linarith) hεpos.le
-    have hlogx : 0 < log x := Real.log_pos (by linarith)
-    have hlog2 : 0 < log 2 := Real.log_pos (by norm_num)
-    have hmono : log 2 ≤ log x := Real.log_le_log (by norm_num) (by linarith)
-    have hub : log (log x) ≤ x ^ ε / ε :=
-      calc log (log x) ≤ log x := (Real.log_le_sub_one_of_pos hlogx).trans (by linarith)
-        _ ≤ x ^ ε / ε := Real.log_le_rpow_div (by linarith) hεpos
-    have hlb : log (log 2) ≤ log (log x) := Real.log_le_log hlog2 hmono
-    have hxε : 0 ≤ x ^ ε / ε := by positivity
-    calc |log (log x)| ≤ x ^ ε / ε + |log (log 2)| := by
-          rw [abs_le]
-          exact ⟨by linarith [neg_abs_le (log (log 2))],
-            by linarith [abs_nonneg (log (log 2))]⟩
-      _ ≤ (1 / ε + |log (log 2)|) * x ^ ε := by
-          have h2 : |log (log 2)| ≤ |log (log 2)| * x ^ ε := le_mul_of_one_le_right (abs_nonneg _) hx1
-          have h1 : x ^ ε / ε = 1 / ε * x ^ ε := by ring
-          rw [add_mul]; linarith
-
 /-- `γ * x ^ (-s)` is integrable on `Ioi 1` for `s > 1`. -/
 private theorem integrableOn_γ_mul_rpow (s : ℝ) (hs : 1 < s) :
     MeasureTheory.IntegrableOn (fun x => γ * x ^ (-s)) (Set.Ioi 1) := by
@@ -1576,7 +1518,7 @@ private theorem integrableOn_E₂Λ_mul_rpow (s : ℝ) (hs : 1 < s) :
   · -- Near `1`: `⌊x⌋₊ = 1`, the sum is `0`, so `E₂Λ x = -log (log x) - γ`.
     have hsub : Set.Ioo (1:ℝ) 2 ⊆ Set.Ioi 1 := fun x hx => hx.1
     have h1 := (integrableOn_γ_mul_rpow s hs).mono_set hsub
-    have h2 := (integrableOn_log_log_mul_rpow s hs).mono_set hsub
+    have h2 := (Real.integrableOn_log_log_mul_rpow hs).mono_set hsub
     have hb : MeasureTheory.IntegrableOn
         (fun x => -(log (log x) * x ^ (-s)) - γ * x ^ (-s)) (Set.Ioo 1 2) :=
       h2.neg.sub h1
@@ -1620,11 +1562,11 @@ private theorem log_zeta_eq (s : ℝ) (hs : 1 < s) :
       = (∫ x in Set.Ioi 1, log (log x) * x ^ (-s))
         + (∫ x in Set.Ioi 1, γ * x ^ (-s))
         + (∫ x in Set.Ioi 1, E₂Λ x * x ^ (-s)) := by
-    rw [← MeasureTheory.integral_add (integrableOn_log_log_mul_rpow s hs)
+    rw [← MeasureTheory.integral_add (Real.integrableOn_log_log_mul_rpow hs)
       (integrableOn_γ_mul_rpow s hs)]
     rw [← MeasureTheory.integral_add (f := fun x => log (log x) * x ^ (-s) + γ * x ^ (-s))
       (g := fun x => E₂Λ x * x ^ (-s))
-      ((integrableOn_log_log_mul_rpow s hs).add (integrableOn_γ_mul_rpow s hs))
+      ((Real.integrableOn_log_log_mul_rpow hs).add (integrableOn_γ_mul_rpow s hs))
       (integrableOn_E₂Λ_mul_rpow s hs)]
     apply MeasureTheory.setIntegral_congr_fun measurableSet_Ioi
     intro x _

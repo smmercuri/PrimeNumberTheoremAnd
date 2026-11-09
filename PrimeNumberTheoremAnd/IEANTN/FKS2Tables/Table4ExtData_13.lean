@@ -7,7 +7,7 @@ Regenerate with scripts/fks2_gen_table4_cells.py. -/
 namespace FKS2.Table4Ext
 
 set_option maxRecDepth 100000
-set_option linter.style.nativeDecide false
+set_option linter.style.native false
 
 def cells_13 : List Cell := [
   ⟨17050, 17055, 1537/100000000000000000000000000000000000000000000, 3264391/25000, 326487/2500⟩,

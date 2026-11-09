@@ -20,7 +20,7 @@ namespace FKS2
 
 open Real Table4Ext LeanCert.Core LeanCert.ANT.Asymp
 
-set_option linter.style.nativeDecide false
+set_option linter.style.native false
 
 /-! ## FKS2 Corollary 24, row 2 (`(log x)^{3/2}·x^{-1/2}`, `log x ∈ [1, 65.65]`)
 

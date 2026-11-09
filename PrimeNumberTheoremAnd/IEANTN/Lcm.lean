@@ -205,7 +205,7 @@ lemma Criterion.val_two_L' (c : Criterion) : (c.L').factorization 2 = Nat.log 2 
           Nat.pow_log_le_self 2 <| by linarith⟩)
         norm_num [Nat.Prime.factorization_self (prime_two)]
     aesop
-  rw [show c.L' = L c.n / (∏ i, c.q i) by rfl, Nat.factorization_div] <;> norm_num [h_lcm, c.hn]
+  rw [show c.L' = L c.n / (∏ i, c.q i) by rfl, Nat.factorization_div] <;> norm_num [h_lcm, c.hn, -Nat.factorization_def]
   · rw [Nat.factorization_eq_zero_of_not_dvd] <;> norm_num [Fin.prod_univ_three]
     norm_num [Nat.mul_mod, Nat.mod_mod, Nat.odd_iff.mp (Nat.Prime.odd_of_ne_two (c.hq 0)
       (by linarith [c.p_gt_two 0, c.q_gt_two 0])), Nat.odd_iff.mp (Nat.Prime.odd_of_ne_two (c.hq 1)
@@ -468,7 +468,7 @@ lemma Criterion.val_two_M_ge_L' (c : Criterion) : (c.M).factorization 2 ≥ (c.L
   · simp only [Fin.prod_univ_three, ne_eq, _root_.mul_eq_zero, OfNat.ofNat_ne_zero,
       Nat.Prime.ne_zero (c.hp _), or_self, not_false_eq_true, Nat.ne_of_gt (Criterion.m_pos c),
       factorization_mul]
-    rw [show (4 : ℕ) = 2 ^ 2 by norm_num, Nat.factorization_pow]; norm_num; ring_nf;
+    rw [show (4 : ℕ) = 2 ^ 2 by norm_num, Nat.factorization_pow]; norm_num [-Nat.factorization_def]; ring_nf;
       linarith [Nat.Prime.factorization_self (prime_two)]
   · simp only [ne_eq, _root_.mul_eq_zero, OfNat.ofNat_ne_zero, prod_eq_zero_iff, mem_univ,
     true_and, false_or, not_or, not_exists]
@@ -914,7 +914,7 @@ theorem Criterion.σnorm_M_ge_σnorm_L'_mul (c : Criterion) :
       ((∑ i ∈ Finset.range (Nat.factorization c.M p + 1), (1 / p : ℝ) ^ i) /
       (∑ i ∈ Finset.range (Nat.factorization (c.L' : ℕ) p + 1), (1 / p : ℝ) ^ i))) ≥
       (∏ p ∈ Finset.image c.p Finset.univ, (1 + 1/(p * (p + 1) : ℝ)))*(1 + 3 / (8 * c.n : ℝ)) := by
-    refine le_trans ?_ (Finset.prod_le_prod ?_ h_ratio_terms)
+    refine le_trans ?_ (Finset.prod_le_prod₀ ?_ h_ratio_terms)
     · rw [Finset.prod_ite]
       refine mul_le_mul ?_ ?_ (by positivity) (Finset.prod_nonneg fun _ _ ↦ by positivity)
       · rw [Finset.prod_subset]
@@ -930,7 +930,7 @@ theorem Criterion.σnorm_M_ge_σnorm_L'_mul (c : Criterion) :
           [mem_primeFactors, true_and, prod_const]
         · simp only [one_pow, mul_one]
           refine le_self_pow₀ (M₀ := ℝ) (by norm_num ; positivity) ?_
-          · norm_num; exact ⟨2, Nat.prime_two, h.1, h.2, fun i ↦ by linarith [c.p_gt_two i], rfl⟩
+          · norm_num; exact ⟨h.1, h.2, fun i ↦ by linarith [c.p_gt_two i]⟩
         · contrapose! h
           refine ⟨dvd_mul_of_dvd_left ?_ _, Nat.ne_of_gt (Criterion.M_pos c)⟩
           · exact dvd_mul_of_dvd_left (dvd_mul_of_dvd_left (by decide) _) _
@@ -1251,7 +1251,7 @@ theorem prod_q_ge {n : ℕ} (hn : n ≥ X₀ ^ 2) :
   rw [show ∏ i : Fin 3, (1 + (1 + 1 / (log √(n : ℝ)) ^ 3) ^ ((i : ℕ) + 1 : ℝ) / n) =
       ∏ i : Fin 3, (1 + (1 + 1 / (log √(n : ℝ)) ^ 3) ^ ((3 : ℝ) - (i : ℕ)) / n) by
     simp only [Fin.prod_univ_three, Fin.val_zero, Fin.val_one, Fin.val_two]; ring_nf]
-  apply Finset.prod_le_prod (fun _ _ ↦ by positivity)
+  apply Finset.prod_le_prod₀ (fun _ _ ↦ by positivity)
   intro i _
   suffices h : (1 : ℝ) / (exists_q_primes hn).choose i ≤
       (1 + 1 / (log √(n : ℝ)) ^ 3) ^ ((3 : ℝ) - (i : ℕ)) / n from (by linarith)
@@ -1304,7 +1304,7 @@ theorem prod_p_ge {n : ℕ} (hn : n ≥ X₀ ^ 2) :
         ((exists_p_primes hn).choose i * ((exists_p_primes hn).choose i + 1))) ≥
       ∏ i : Fin 3,
         (1 + 1 / ((1 + 1 / (log √(n : ℝ)) ^ 3) ^ (2 * (i : ℕ) + 2 : ℝ) * (n + √n))) := by
-  refine Finset.prod_le_prod (fun i _ => by positivity [hlog hn]) fun i _ => ?_
+  refine Finset.prod_le_prod₀ (fun i _ => by positivity [hlog hn]) fun i _ => ?_
   set p := (exists_p_primes hn).choose
   have h₀ (i) : √n < p i := by
     have : p 0 ≤ p i := by

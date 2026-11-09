@@ -70,3 +70,6 @@ home_page/_include/easy_to_unlock.md
 
 ## Scripts
 scripts/*
+
+## Lean bump working state
+.bump/

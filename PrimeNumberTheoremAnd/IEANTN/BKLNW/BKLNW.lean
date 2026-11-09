@@ -748,8 +748,8 @@ theorem thm_5 (I : Inputs) {b x : ℝ} (hb : b ≥ 7) (hx : x ≥ exp b) :
     gcongr
     · unfold Inputs.a₁
       by_cases h : b ≤ 2 * log I.x₁
-      · simp only [if_pos h, prop_4_a I hx]
-      · simp only [if_neg h, prop_4_b I hb hx]
+      · simp only [ite_eq_left h, prop_4_a I hx]
+      · simp only [ite_eq_right h, prop_4_b I hb hx]
     · unfold Inputs.a₂
       convert! cor_3_1 I hb hx
       rw [← Int.natCast_floor_eq_floor (div_nonneg (by linarith) (log_nonneg (by norm_num)))]; rfl
@@ -1497,7 +1497,7 @@ theorem bklnw_cor_8_1b (k : ℕ) (b₀ : ℝ) (hk : 1 ≤ k ∧ k ≤ 5)
       fun b ↦ B_8_1 k b (table_10_next b)
     have hmem : B_8_1 k b (table_10_next b) ∈ S := mem_image_of_mem _
       (mem_filter.mpr ⟨hb_in, hb₀_le, hb_lt_K⟩)
-    rw [B_8_1', dif_pos ⟨B_8_1 k b (table_10_next b), hmem⟩]
+    rw [B_8_1', dite_eq_left ⟨B_8_1 k b (table_10_next b), hmem⟩]
     exact Finset.le_sup' id hmem
   have hx_gt_one : 1 < x := by
     have hb20 : (20 : ℝ) ≤ b₀ := table_10_entries_ge_20 b₀ hb₀
@@ -1940,7 +1940,6 @@ private lemma table_12_Cb_bounds (b c C M : ℝ) (Cb : ℕ → ℝ)
   all_goals try (
     intro hM
     norm_num at hM
-    try contradiction
   )
   all_goals try (
     refine le_of_le_of_mem_Icc_one_five Cb bklnw_Cb_row6 ?_ ?_ ?_ ?_ ?_ k hk <;>

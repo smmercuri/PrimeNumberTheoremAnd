@@ -27,7 +27,7 @@ namespace Table4Ext
 
 open Real
 
-set_option linter.style.nativeDecide false
+set_option linter.style.native false
 
 /-- All generated cells, in grid order. -/
 def allCells : List Cell :=

@@ -9,9 +9,10 @@ public import Mathlib.Analysis.CStarAlgebra.Classes
 public import Mathlib.Analysis.Real.Pi.Bounds
 public import Mathlib.Analysis.SpecialFunctions.Complex.Circle
 public import Mathlib.Analysis.SpecialFunctions.Trigonometric.Cotangent
-public import Mathlib.Data.Int.Star
+public import Mathlib.Algebra.Order.Star.Int
 public import Mathlib.Algebra.Order.Star.Real
 public import Mathlib.MeasureTheory.Integral.DominatedConvergence
+public import Mathlib.NumberTheory.ModularForms.EisensteinSeries.Summable
 public import Mathlib.NumberTheory.ZetaValues
 public import PrimeNumberTheoremAnd.IEANTN.Mertens
 public import PrimeNumberTheoremAnd.Mathlib.Analysis.SpecialFunctions.Complex.LogBounds
@@ -670,7 +671,7 @@ theorem lemma_IBP_bound_C1 {a b : ℝ} (hab : a < b) (g : ℝ → ℝ) (F : ℝ 
             hcont.integrableOn_Icc.mono_set Ioo_subset_Icc_self
           exact hintg''.congr_fun (fun x hx ↦
             by simp only [derivWithin_of_mem_nhds (Icc_mem_nhds hx.1 hx.2)]) measurableSet_Ioo
-        rwa [IntegrableOn, Measure.restrict_congr_set Ioo_ae_eq_Ioc] at *
+        rw [IntegrableOn, Measure.restrict_congr_set Ioo_ae_eq_Ioc] at *; assumption
       have hintFg : IntegrableOn (fun x ↦ F x * deriv g x) (Ioc a b) := by
         have hbdd : ∃ C, ∀ x ∈ Ioc a b, ‖F x‖ ≤ C :=
           IsCompact.exists_bound_of_continuousOn isCompact_Icc hF.continuousOn |>
@@ -1596,7 +1597,7 @@ lemma lemma_aachcanc_pointwise (s : ℂ) {n : ℤ} (hn : n ≠ 0)
     ring_nf
   · simp_all only [sub_eq_iff_eq_add, zero_add, ne_eq, mul_eq_zero, I_ne_zero, ofReal_eq_zero,
       pi_ne_zero, OfNat.ofNat_ne_zero, false_or, not_or]
-    constructor <;> exact fun h ↦ h_denom <| by linear_combination' h * h
+    constructor <;> exact fun h ↦ h_denom <| by linear_combination congr($h * $h)
   · simp_all [mul_assoc, mul_comm]
   · contrapose! h_deriv_n
     simp_all [mul_assoc, mul_comm, mul_left_comm, div_eq_mul_inv, sub_eq_iff_eq_add]
@@ -1974,7 +1975,7 @@ theorem lemma_abadtoabsum {a b : ℝ} (ha : 0 < a) (hb' : b.IsHalfInteger) (hab 
     have hdisjoint : Disjoint (Finset.Icc 1 ⌊a⌋₊) (Ioc ⌊a⌋₊ ⌊b⌋₊) :=
       disjoint_left.mpr fun x hx₁ hx₂ ↦ by simp only [Finset.mem_Icc] at hx₁; simp only [Finset.mem_Ioc] at hx₂; omega
     rw [hfinset, sum_union hdisjoint] at hmac
-    linear_combination' hmac
+    linear_combination hmac
   · have h_integral_bound : ‖∫ y in Set.Ioi b, (Int.fract y - 1 / 2 : ℂ) * ((y : ℂ) ^ (-(s + 1)))‖ ≤
         (1 / 2) * (1 / (s.re * b ^ s.re)) := by
       have hstep1 : ‖∫ y in Set.Ioi b, (Int.fract y - 1 / 2 : ℂ) * ((y : ℂ) ^ (-(s + 1)))‖ ≤
@@ -2057,7 +2058,7 @@ lemma lemma_abadsumas_sum_fourier (s : ℂ) {a b : ℝ} (ha : 0 < a)
           exact ⟨hy.1, hy.2⟩
         have h_f_val : f y = (y ^ (-s.re) : ℝ) * e (-(s.im / (2 * π)) * Real.log y) := by
           dsimp [f]
-          rw [if_pos h_bounds]
+          rw [ite_eq_left h_bounds]
         dsimp only
         rw [h_f_val, e]
         calc cexp (↑(-2 * π * y * ↑n) * I) • (↑(y ^ (-s.re)) * cexp (2 * ↑π * I * ↑(-(s.im / (2 * π)) * Real.log y)))
@@ -4293,7 +4294,10 @@ lemma lemma_abadimpseri (ϑ : ℝ) (hϑ : |ϑ| < 1) :
           · exact_mod_cast summable_nat_add_iff 2 |>.2 <| summable_nat_pow_inv.2 <| by omega
         convert h_sum_zeta.le using 2
         erw [zeta_eq_tsum_one_div_nat_add_one_cpow] <;> norm_num
-        · convert ofReal_re _; simp [Complex.ofReal_tsum]
+        · have h_ofReal : (∑' n : ℕ, (((n : ℂ) + 1) ^ 3)⁻¹) =
+              ((∑' n : ℕ, (((n : ℝ) + 1) ^ 3)⁻¹ : ℝ) : ℂ) := by
+            simp [Complex.ofReal_tsum]
+          rw [h_ofReal, ofReal_re]
     rw [Summable.tsum_eq_zero_add]
     · norm_num [add_assoc, add_left_comm, add_comm, div_eq_mul_inv, mul_add, mul_comm,
         mul_left_comm, tsum_mul_left] at *
@@ -4475,7 +4479,7 @@ private lemma lemma_abadsumas_sum_main_term_a (ϑ : ℝ) (hϑ_lt : |ϑ| < 1)
                 rw [← Equiv.tsum_eq Equiv.pnatEquivNat.symm]
                 simp only [one_div, Equiv.pnatEquivNat_symm_apply, Nat.succPNat_coe,
                   Nat.succ_eq_add_one, Nat.cast_add, Nat.cast_one]
-    rw [h_sum_shift, show g ϑ = 1 / Complex.sin (↑π * ↑ϑ) - 1 / (↑π * ↑ϑ) by dsimp [g]; rw [if_pos hϑ]]
+    rw [h_sum_shift, show g ϑ = 1 / Complex.sin (↑π * ↑ϑ) - 1 / (↑π * ↑ϑ) by dsimp [g]; rw [ite_eq_left hϑ]]
     rw [show ↑π * (1 / Complex.sin (↑π * ↑ϑ) - 1 / (↑π * ↑ϑ)) = ↑π / Complex.sin (↑π * ↑ϑ) - 1 / ↑ϑ by field_simp]
     rw [lemma_abadeuleulmit1 h_not_int]
     ring_nf
@@ -4494,7 +4498,7 @@ private lemma lemma_abadsumas_sum_main_term_b (ϑ_minus : ℝ)
   · have hϑ_minus_mem : (ϑ_minus : ℂ) ∈ integerComplement :=
       lemma_abadsumas_not_in_integerComplement hϑ_minus_lt hθ
     rw [show (π : ℂ) * g ϑ_minus = ↑π / Complex.sin (↑π * ↑ϑ_minus) - 1 / (ϑ_minus : ℂ) by
-      dsimp [g]; rw [if_pos hθ, mul_sub, mul_one_div, mul_one_div]; congr 1
+      dsimp [g]; rw [ite_eq_left hθ, mul_sub, mul_one_div, mul_one_div]; congr 1
       have hπ : (π : ℂ) ≠ 0 := Complex.ofReal_ne_zero.mpr Real.pi_ne_zero
       have hϑ : (ϑ_minus : ℂ) ≠ 0 := Complex.ofReal_ne_zero.mpr hθ
       field_simp [hπ, hϑ],
@@ -4921,11 +4925,11 @@ theorem lemma_abadsumas {s : ℂ} (hsigma : 0 ≤ s.re) {a b : ℝ} (ha : 0 < a)
           rw [tsum_mul_left, hsplit, tsum_mul_left, tsum_mul_left]
         rw [hfactor]
         rcases eq_or_ne ϑ 0 with hϑ0 | hϑ0
-        · simp only [hϑ0, abs_zero, add_zero, ne_eq, not_true, if_false]
+        · simp only [hϑ0, abs_zero, add_zero, ne_eq, not_true, ite_false]
           rw [show 0 = ϑ from hϑ0.symm]
           simp only [neg_add_rev, hϑ0, sub_zero, one_div, zero_mul, add_zero, ge_iff_le]
           have hq : ∑' (n : ℕ), (1 / (↑n + 1 : ℝ) ^ 2 + 1 / (↑n + 1 : ℝ) ^ 2) = π ^ 2 / 3 := by
-            simp only [hϑ0, sub_zero, add_zero, if_true] at hquad
+            simp only [hϑ0, sub_zero, add_zero, ite_true] at hquad
             exact hquad
           have hq' : ∑' (n : ℕ), (((↑n + 1 : ℝ) ^ 2)⁻¹ + ((↑n + 1 : ℝ) ^ 2)⁻¹) = π ^ 2 / 3 := by
             convert hq using 3
@@ -4942,7 +4946,7 @@ theorem lemma_abadsumas {s : ℂ} (hsigma : 0 ≤ s.re) {a b : ℝ} (ha : 0 < a)
               π^2 / Real.sin (π * ϑ)^2 - 1/ϑ^2 := by
             rw [hquad]; simp [hϑ0]
           rw [hquad']
-          simp only [hϑ0, ne_eq, not_false_eq_true, if_true]
+          simp only [hϑ0, ne_eq, not_false_eq_true, ite_true]
           have hre2 : (1 / ((π : ℂ) * (ϑ : ℂ)) ^ 2).re = 1 / (π * ϑ) ^ 2 := by
             have h : ((1 : ℂ) / ((π : ℂ) * (ϑ : ℂ)) ^ 2) = ((1 / (π * ϑ) ^ 2 : ℝ) : ℂ) := by
               push_cast; ring

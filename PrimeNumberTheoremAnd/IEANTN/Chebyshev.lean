@@ -577,7 +577,7 @@ theorem psi_upper (x : ℝ) (hx : 30 ≤ x) : ψ x ≤ 6 * a * x / 5 + (log (x/5
       exact le_log_iff_exp_le (by linarith)|>.mpr (by linarith [exp_one_lt_three])
     · exact Nat.floor_le (by bound)
 
-set_option linter.style.nativeDecide false in
+set_option linter.style.native false in
 open LeanCert.CertifiedBounds.Chebyshev in
 /-- The incremental checker verifies ψ(N) ≤ 1.11 N for all N = 1, …, 11723.
     Note: the sparse checkpoint ladder indicated in the blueprint is not needed;

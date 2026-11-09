@@ -1,6 +1,7 @@
 module
 
 public import Mathlib.Algebra.Order.Star.Real
+public import Mathlib.Analysis.SpecialFunctions.Log.NegMulLog
 public import Mathlib.MeasureTheory.Integral.Gamma
 public import Mathlib.NumberTheory.Harmonic.GammaDeriv
 

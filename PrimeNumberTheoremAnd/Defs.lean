@@ -3,6 +3,7 @@ module
 public import Architect
 public import PrimeNumberTheoremAnd.Fourier
 public import Mathlib.NumberTheory.Chebyshev
+public import Mathlib.Analysis.SpecialFunctions.Log.Deriv
 
 @[expose] public section
 

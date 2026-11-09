@@ -37,7 +37,7 @@ private lemma row20_a1_le : Inputs.default.a₁ (20 : ℝ) ≤ (1.00000002 : ℝ
     grw [BKLNW_app.table_8_ε.le_simp (log Inputs.default.x₁) (by linarith [hlog.1])]
     grind [BKLNW_app.table_8_ε']
   unfold Inputs.a₁
-  rw [if_pos (by linarith [hlog.1] : (20 : ℝ) ≤ 2 * log Inputs.default.x₁)]
+  rw [ite_eq_left (by linarith [hlog.1] : (20 : ℝ) ≤ 2 * log Inputs.default.x₁)]
   have hb : (1.93378e-8 * BKLNW_app.table_8_margin : ℝ) ≤ 1.00000002 - 1 := by
     norm_num [BKLNW_app.table_8_margin]
   linarith [hε19, hb]
@@ -70,7 +70,7 @@ private lemma row25_a1_le : Inputs.default.a₁ (25 : ℝ) ≤ (1.00000002 : ℝ
     grw [BKLNW_app.table_8_ε.le_simp (log Inputs.default.x₁) (by linarith [hlog.1])]
     grind [BKLNW_app.table_8_ε']
   unfold Inputs.a₁
-  rw [if_pos (by linarith [hlog.1] : (25 : ℝ) ≤ 2 * log Inputs.default.x₁)]
+  rw [ite_eq_left (by linarith [hlog.1] : (25 : ℝ) ≤ 2 * log Inputs.default.x₁)]
   have hb : (1.93378e-8 * BKLNW_app.table_8_margin : ℝ) ≤ 1.00000002 - 1 := by
     norm_num [BKLNW_app.table_8_margin]
   linarith [hε19, hb]
@@ -153,7 +153,7 @@ private lemma row26_a1_le : Inputs.default.a₁ (26 : ℝ) ≤ (1.00000002 : ℝ
     grw [BKLNW_app.table_8_ε.le_simp (log Inputs.default.x₁) (by linarith [hlog.1])]
     grind [BKLNW_app.table_8_ε']
   unfold Inputs.a₁
-  rw [if_pos (by linarith [hlog.1] : (26 : ℝ) ≤ 2 * log Inputs.default.x₁)]
+  rw [ite_eq_left (by linarith [hlog.1] : (26 : ℝ) ≤ 2 * log Inputs.default.x₁)]
   have hb : (1.93378e-8 * BKLNW_app.table_8_margin : ℝ) ≤ 1.00000002 - 1 := by
     norm_num [BKLNW_app.table_8_margin]
   linarith [hε19, hb]

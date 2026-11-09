@@ -810,24 +810,24 @@ lemma μ_zero (c ε : ℝ) : μ c ε 0 = 0 := by
 lemma μ_nonneg_of_pos {c ε : ℝ} (hc : 0 < c) (hε : 0 < ε) {t : ℝ} (ht : 0 < t) :
     0 ≤ μ c ε t := by
   unfold μ
-  rw [if_neg (by linarith : ¬ t < 0), if_pos ht, pre_μ, neg_neg]
+  rw [ite_eq_right (by linarith : ¬ t < 0), ite_eq_left ht, pre_μ, neg_neg]
   exact MeasureTheory.setIntegral_nonneg measurableSet_Iic fun ξ _ ↦ η_nonneg hc hε ξ
 
 lemma μ_nonpos_of_neg {c ε : ℝ} (hc : 0 < c) (hε : 0 < ε) {t : ℝ} (ht : t < 0) :
     μ c ε t ≤ 0 := by
   unfold μ
-  rw [if_pos ht, pre_μ]
+  rw [ite_eq_left ht, pre_μ]
   simp only [neg_nonpos]
   exact MeasureTheory.setIntegral_nonneg measurableSet_Iic fun ξ _ ↦ η_nonneg hc hε ξ
 
 lemma μ_neg (c ε t : ℝ) : μ c ε (-t) = -μ c ε t := by
   rcases lt_trichotomy t 0 with ht | rfl | ht
   · unfold μ
-    rw [if_neg (by linarith : ¬ -t < 0), if_pos (by linarith : -t > 0), neg_neg,
-      if_pos ht]
+    rw [ite_eq_right (by linarith : ¬ -t < 0), ite_eq_left (by linarith : -t > 0), neg_neg,
+      ite_eq_left ht]
   · simp [μ]
   · unfold μ
-    rw [if_pos (by linarith : -t < 0), if_neg (by linarith : ¬ t < 0), if_pos ht,
+    rw [ite_eq_left (by linarith : -t < 0), ite_eq_right (by linarith : ¬ t < 0), ite_eq_left ht,
       neg_neg]
 
 lemma continuous_besselI0 : Continuous besselI0 := by
@@ -895,7 +895,7 @@ lemma integrable_η {c ε : ℝ} (hc : 0 < c) (hε : 0 < ε) :
 lemma μ_eq_zero_of_lt_neg {c ε : ℝ} (hε : 0 < ε) {t : ℝ} (ht : t < -ε) :
     μ c ε t = 0 := by
   unfold μ
-  rw [if_pos (by linarith : t < 0), pre_μ, neg_eq_zero]
+  rw [ite_eq_left (by linarith : t < 0), pre_μ, neg_eq_zero]
   refine MeasureTheory.setIntegral_eq_zero_of_forall_eq_zero fun ξ hξ ↦ ?_
   have h1 : ξ ≤ t := hξ
   refine η_eq_zero_of_abs_gt ?_
@@ -913,8 +913,8 @@ lemma μ_antitoneOn {c ε : ℝ} (hc : 0 < c) (hε : 0 < ε) :
   intro s hs t ht hst
   rw [Set.mem_Ioi] at hs ht
   unfold μ
-  rw [if_neg (by linarith : ¬ t < 0), if_pos ht, if_neg (by linarith : ¬ s < 0),
-    if_pos hs, pre_μ, pre_μ, neg_neg, neg_neg]
+  rw [ite_eq_right (by linarith : ¬ t < 0), ite_eq_left ht, ite_eq_right (by linarith : ¬ s < 0),
+    ite_eq_left hs, pre_μ, pre_μ, neg_neg, neg_neg]
   refine MeasureTheory.setIntegral_mono_set ((integrable_η hc hε).integrableOn)
     (MeasureTheory.ae_of_all _ fun ξ ↦ η_nonneg hc hε ξ) ?_
   exact (Set.Iic_subset_Iic.mpr (by linarith : -t ≤ -s)).eventuallyLE
@@ -1063,7 +1063,6 @@ lemma besselI0_sub_partial_le (x : ℝ) (N : ℕ) :
     rw [show 2 * (k + N) = 2 * N + 2 * k by ring, pow_add, div_mul_div_comm]
     gcongr (x / 2) ^ (2 * N) * (x / 2) ^ (2 * k) / ?_ <;>
       first
-        | exact mul_pos hN hk
         | (rw [pow_mul, pow_mul]; positivity)
         | nlinarith [hfact, hNk]
   have htail : (∑' k : ℕ, (x / 2) ^ (2 * (k + N)) / (((k + N).factorial : ℝ)) ^ 2) ≤

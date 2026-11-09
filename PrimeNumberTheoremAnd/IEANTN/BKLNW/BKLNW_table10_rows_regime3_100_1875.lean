@@ -16,7 +16,7 @@ private lemma logx1_lt_44 : log Inputs.default.x₁ < 44 := by
   rw [h, Real.log_pow]; push_cast; nlinarith [LogTables.log_10_lt]
 
 private lemma a1_large_le_two {b : ℝ} (hb : 100 ≤ b) : Inputs.default.a₁ b ≤ (2 : ℝ) := by
-  rw [Inputs.a₁, if_neg (by linarith [logx1_lt_44] : ¬ (b ≤ 2 * log Inputs.default.x₁))]
+  rw [Inputs.a₁, ite_eq_right (by linarith [logx1_lt_44] : ¬ (b ≤ 2 * log Inputs.default.x₁))]
   have heps : Inputs.default.ε (b / 2) ≤ 4.2676e-5 := by
     change BKLNW_app.table_8_ε (b / 2) ≤ 4.2676e-5
     exact BKLNW_app.table_8_ε_le_of_row BKLNW_app.table_8_mem_20 (by nlinarith)

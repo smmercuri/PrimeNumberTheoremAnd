@@ -7,7 +7,7 @@ public import PrimeNumberTheoremAnd.Tactic.Simprocs
 
 public section
 
-set_option linter.style.nativeDecide false
+set_option linter.style.native false
 
 /-!
 # Primality certificates and prime-counting tables

@@ -692,7 +692,7 @@ lemma a1_le_small {b : ℝ} (hb : b ≤ 86) : Inputs.default.a₁ b ≤ (1.00000
     grw [BKLNW_app.table_8_ε.le_simp (log Inputs.default.x₁) (by linarith [hlog.1])]
     grind [BKLNW_app.table_8_ε']
   unfold Inputs.a₁
-  rw [if_pos (by linarith [hlog.1] : b ≤ 2 * log Inputs.default.x₁)]
+  rw [ite_eq_left (by linarith [hlog.1] : b ≤ 2 * log Inputs.default.x₁)]
   have hb' : (1.93378e-8 * BKLNW_app.table_8_margin : ℝ) ≤ 1.00000002 - 1 := by
     norm_num [BKLNW_app.table_8_margin]
   linarith [hε19, hb']

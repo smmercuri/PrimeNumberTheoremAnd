@@ -181,7 +181,10 @@ theorem BorelCaratheodoryDeriv {M r R : ℝ} {f : ℂ → ℂ} {z : ℂ}
     (hyp_z : z ∈ Metric.closedBall 0 r) :
     ‖deriv f z‖ ≤ 16 * M * R ^ 2 / (R - r) ^ 3 := by
   have hr' : 2 * M * ((R + r) / 2) ^ 2 / ((R - (R + r) / 2) * ((R + r) / 2 - r) ^ 2) =
-      4 * M * (R + r) ^ 2 / (R - r) ^ 3 := by field_simp; ring
+      4 * M * (R + r) ^ 2 / (R - r) ^ 3 := by
+    rw [div_eq_div_iff (mul_ne_zero (by linarith) (pow_ne_zero _ (by linarith)))
+      (pow_ne_zero _ (by linarith))]
+    ring
   calc ‖deriv f z‖
     _ ≤ 4 * M * (R + r) ^ 2 / (R - r) ^ 3 := hr' ▸
       DerivativeBound Mpos rpos (by linarith) (by linarith)
@@ -488,7 +491,7 @@ lemma CfAnalytic {r R : ℝ} {f : ℂ → ℂ}
         filter_upwards [hhWeq.2, hhWanalytic.continuousAt.eventually_ne hhWne_zero] with z hz hz'
         by_cases h : z = w
         · subst h
-          rw [dif_pos w_in_zeros]
+          rw [dite_eq_left w_in_zeros]
           congr 1
           exact hhWeq.1
         · have z_not_in : z ∉ SetOfZeros r f := by
@@ -496,7 +499,7 @@ lemma CfAnalytic {r R : ℝ} {f : ℂ → ℂ}
             have hfz : f z = 0 := hmem.2
             rw [hz] at hfz
             exact absurd hfz (mul_ne_zero (pow_ne_zero _ (sub_ne_zero_of_ne h)) hz')
-          rw [dif_neg z_not_in, hz]
+          rw [dite_eq_right z_not_in, hz]
           have hw_mem : w ∈ finite_zeros_mono.toFinset :=
             finite_zeros_mono.mem_toFinset.mpr w_in_zeros
           rw [Finset.prod_eq_prod_sdiff_singleton_mul hw_mem
@@ -642,7 +645,7 @@ lemma norm_fOfZero_le_norm_BlaschkeOfZero {r R : ℝ} {f : ℂ → ℂ}
   rw [BlaschkeOfZero r_pos r_lt_one r_lt_R finiteZeros hf_neq_zero_at_zero, ← mul_one ‖f 0‖]
   refine mul_le_mul (by rw[mul_one]) ?_ (zero_le_one) (mul_nonneg (norm_nonneg (f 0)) zero_le_one)
   rw [← Finset.prod_const_one (s := (finiteSetOfZeros_mono r_lt_one finiteZeros).toFinset)]
-  apply Finset.prod_le_prod
+  apply Finset.prod_le_prod₀
   · intro ρ hρ
     exact zero_le_one
   · intro ρ hρ
@@ -858,7 +861,7 @@ theorem ZerosBound {B r R : ℝ} {f : ℂ → ℂ}
         rw [Finset.prod_pow_eq_pow_sum]
     _ ≤ ∏ ρ ∈ (finiteSetOfZeros_mono r_lt_one finiteZeros).toFinset,
         (R / ‖ρ‖) ^ analyticOrderNatAt f ρ := by
-      apply Finset.prod_le_prod
+      apply Finset.prod_le_prod₀
       · intro ρ _
         exact pow_nonneg (div_nonneg (le_of_lt R_pos) (le_of_lt r_pos)) _
       · intro ρ hρ
@@ -1150,8 +1153,8 @@ theorem FinalBound {B r' r R' R : ℝ} {f : ℂ → ℂ} {z : ℂ}
       · simp only [differentiableAt_fun_id, differentiableAt_const, DifferentiableAt.fun_sub]
     unfold BlaschkeB Cf
     simp only [rFiniteZeros, ↓reduceDIte, dite_eq_ite, ite_mul, ← logDeriv_apply, ← sum1, ← sum2]
-    rw [← logDeriv_prod blaschke_prod_ne hDiff_blaschke,
-      ← logDeriv_prod ?_ hDiff_sub,
+    rw [← logDeriv_fun_prod blaschke_prod_ne hDiff_blaschke,
+      ← logDeriv_fun_prod ?_ hDiff_sub,
       ← logDeriv_mul _ fz_ne (Finset.prod_ne_zero_iff.mpr blaschke_prod_ne)
         ((hfAnalytic z (Metric.closedBall_subset_closedBall r'_lt_one.le hz.1)).differentiableAt)
         (DifferentiableAt.fun_finsetProd hDiff_blaschke),
@@ -1165,7 +1168,7 @@ theorem FinalBound {B r' r R' R : ℝ} {f : ℂ → ℂ} {z : ℂ}
         (R - w * (starRingEnd ℂ) ρ / R) ^ analyticOrderNatAt f ρ) / ∏ ρ ∈ rFiniteZeros.toFinset,
         (w - ρ) ^ analyticOrderNatAt f ρ := by
         filter_upwards [(isOpen_compl_iff.mpr rFiniteZeros.isClosed).mem_nhds zNotInZeros]
-          with w hw using by rw [if_neg hw]; ring
+          with w hw using by rw [ite_eq_right hw]; ring
       simp only [logDeriv, Pi.div_apply]
       congr 1
       · apply Filter.EventuallyEq.deriv_eq h_eq
@@ -3004,7 +3007,7 @@ lemma I1NewIntegrandBound {SmoothingF : ℝ → ℝ}
     norm_num [Complex.arg]
     ring_nf
     norm_num
-    rw [if_pos (by positivity)]
+    rw [ite_eq_left (by positivity)]
     norm_num [Real.rpow_add (by positivity : 0 < X), Real.rpow_one]
     ring_nf
     norm_num

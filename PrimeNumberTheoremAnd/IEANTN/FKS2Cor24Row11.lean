@@ -42,7 +42,7 @@ namespace Table4Ext
 
 open Real LeanCert.Core LeanCert.ANT.Asymp
 
-set_option linter.style.nativeDecide false
+set_option linter.style.native false
 
 /-- Transport: a checked cell dominated by the table value `eps`, with the
 per-cell numeric certificate `eps ≤ exp(-b'/n)`, gives the row-`n` curve
@@ -339,7 +339,7 @@ end Table4Ext
 
 open Real Table4Ext LeanCert.Core LeanCert.ANT.Asymp
 
-set_option linter.style.nativeDecide false
+set_option linter.style.native false
 
 /-! ## FKS2 Corollary 24, row 11 (`x^{-1/100}`, `log x ∈ [1, 3757.6]`)
 

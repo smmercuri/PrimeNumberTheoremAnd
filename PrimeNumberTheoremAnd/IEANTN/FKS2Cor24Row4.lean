@@ -36,7 +36,7 @@ namespace Table4Ext
 
 open Real LeanCert.Core LeanCert.ANT.Asymp
 
-set_option linter.style.nativeDecide false
+set_option linter.style.native false
 
 /-! ## Generic `x^{-1/2}`-curve floor machinery -/
 
@@ -162,7 +162,7 @@ end Table4Ext
 
 open Real Table4Ext LeanCert.Core LeanCert.ANT.Asymp
 
-set_option linter.style.nativeDecide false
+set_option linter.style.native false
 
 /-! ## FKS2 Corollary 24, row 4 (`(log x)²·x^{-1/2}`, `log x ∈ [1, 70.6]`)
 

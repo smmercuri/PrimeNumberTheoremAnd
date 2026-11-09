@@ -494,12 +494,12 @@ theorem criterion (mₐ Mₐ xₐ x₀ : ℝ)
   exact lt_trans hsq' (lt_trans hmul hlow')
 
 -- Native-decide lemma for the computational [3, 599) range
-set_option linter.style.nativeDecide false in
+set_option linter.style.native false in
 open LeanCert.CertifiedBounds.Chebyshev in
 private theorem allThetaChecks_3_599 :
     checkAllThetaRelErrorReal 3 599 (768 / 1000) 20 = true := by native_decide
 
-set_option linter.style.nativeDecide false in
+set_option linter.style.native false in
 open LeanCert.CertifiedBounds.Chebyshev in
 private theorem thetaCheck599 :
     checkThetaRelErrorReal 599 (65 / 1000) 20 = true := by native_decide
@@ -541,7 +541,7 @@ theorem pi_bound_1 (x : ℝ) (hx : x ∈ Set.Ico 2 599) :
       LeanCert.CertifiedBounds.Chebyshev.checkAllThetaRelErrorReal_implies
         3 599 (768 / 1000) 20
         allThetaChecks_3_599 ⌊x⌋₊ hfloor_pos hfloor_ge3 hfloor_lt.le
-    rw [if_pos hfloor_lt] at hpointwise
+    rw [ite_eq_left hfloor_lt] at hpointwise
     have hxlo : (⌊x⌋₊ : ℝ) ≤ x := Nat.floor_le hnn
     have hxhi : x < (⌊x⌋₊ : ℝ) + 1 := Nat.lt_floor_add_one x
     have habs :=
@@ -2440,10 +2440,10 @@ theorem epsilon_bound :
   have : 0 ≤ 30 / (log x) ^ 5 := by positivity
   have : 0 ≤ 8 / (log x) ^ 6 := by positivity
   by_cases hm : 0 ≤ mₐ xₐ
-  · rw [εlower, if_pos hm]
+  · rw [εlower, ite_eq_left hm]
     unfold ε ε'
     linarith
-  · rw [εlower, if_neg hm]
+  · rw [εlower, ite_eq_right hm]
     have := mₐ_xₐ_ge_neg1194
     have halpha_tight : (1 + 1 / log xₐ) ^ 6 ≤ (10016 : ℝ) / 10000 := by
       rw [log_xₐ_val]; norm_num

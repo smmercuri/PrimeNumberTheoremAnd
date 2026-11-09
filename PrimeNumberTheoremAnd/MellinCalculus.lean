@@ -833,7 +833,7 @@ lemma Smooth1_def_ite {ν : ℝ → ℝ} {ε x : ℝ} (xpos : 0 < x) :
   simp +contextual only [mem_Ioi, true_and, ite_mul, one_mul, zero_mul, RCLike.ofReal_real_eq_id,
     id_eq, mul_ite, mul_zero]
   intro y ypos
-  rw [eq_comm, if_neg (by push Not; positivity)]
+  rw [eq_comm, ite_eq_right (by push Not; positivity)]
 
 /-% ** Wrong delimiters on purpose, no need to include this in blueprint
 \begin{lemma}[Smooth1Properties_estimate]\label{Smooth1Properties_estimate}
@@ -1291,12 +1291,13 @@ lemma MellinOfSmooth1a {ν : ℝ → ℝ} (diffν : ContDiff ℝ 1 ν)
         have hy : y ∉ Icc (2 ^ (-ε)) (2 ^ ε) := by
           simp only [mem_Icc, not_and, not_le]; exact hS hz.1 <| (div_le_one hz.2).mp hxy
         simp [DeltaSpikeSupport εpos hz.2.le suppν hy]
-    · apply Integrable.piecewise Smeas ?_ integrableOn_zero
+    · apply Integrable.piecewise Smeas.nullMeasurableSet ?_ integrableOn_zero
       simp only [IntegrableOn, Measure.restrict_restrict_of_subset SsubI]
       apply MeasureTheory.Integrable.mono_measure ?_
       · apply MeasureTheory.Measure.restrict_mono' SsubT.eventuallyLE le_rfl
       have : volume.restrict (Tx ×ˢ Ty) = (volume.restrict Tx).prod (volume.restrict Ty) := by
         rw [Measure.prod_restrict, MeasureTheory.Measure.volume_eq_prod]
+      change Integrable _ (volume.restrict (Tx ×ˢ Ty))
       conv => rw [this]; lhs; intro; rw [mul_comm]
       apply MeasureTheory.Integrable.mul_prod (f := fun x ↦ (x : ℂ) ^ (s - 1))
         (μ := Measure.restrict volume Tx)
@@ -1465,7 +1466,7 @@ lemma Smooth1ContinuousAt {SmoothingF : ℝ → ℝ}
         have : x ∈ Ioi 0 := by
           apply mem_Ioi.mpr
           apply lt_of_lt_of_le (by bound) hx.1
-        rw [indicator, if_pos this]
+        rw [indicator, ite_eq_left this]
     · unfold indicator
       simp_rw [mem_Ioi]
       apply Function.support_subset_iff.mpr

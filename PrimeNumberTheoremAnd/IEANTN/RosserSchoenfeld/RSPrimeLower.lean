@@ -11,7 +11,7 @@ lemma count_prime_le_imp_le_nth (m k : ℕ) (h : Nat.count Nat.Prime m ≤ k) :
   by_contra! hlt
   have hp := Nat.nth_mem_of_infinite Nat.infinite_setOfPred_prime k
   have h1 : Nat.count Nat.Prime (Nat.nth Nat.Prime k + 1) = k + 1 := by
-    rw [Nat.count_succ, if_pos hp, Nat.count_nth_of_infinite Nat.infinite_setOfPred_prime]
+    rw [Nat.count_succ, ite_eq_left hp, Nat.count_nth_of_infinite Nat.infinite_setOfPred_prime]
   linarith [h1 ▸ Nat.count_monotone Nat.Prime hlt]
 
 lemma nth_prime_gt_bound (n m : ℕ)
@@ -77,8 +77,8 @@ lemma p_n_lower_large (n : ℕ) (hn : n ≥ 32) :
             induction n, hn using Nat.le_induction with
             | base =>
               exact Prime.two_le (prime_nth_prime 0) |> succ_le_of_lt |> le_trans <| le_refl _
-            | succ n _ ih =>
-              exact succ_le_of_lt (lt_of_le_of_lt ih (nth_strictMono (infinite_setOfPred_prime) (pred_lt (by positivity))))
+            | succ n hn' ih =>
+              exact succ_le_of_lt (lt_of_le_of_lt ih (nth_strictMono (infinite_setOfPred_prime) (pred_lt (Nat.one_le_iff_ne_zero.mp hn'))))
           exact h_step1 n (by linarith)
         generalize_proofs at *
         have h_exp_approx : Real.exp 1.112 < 33 := by linarith [LogTables.exp_1_112_lt]

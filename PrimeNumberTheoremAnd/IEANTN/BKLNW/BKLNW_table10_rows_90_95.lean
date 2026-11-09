@@ -12,7 +12,7 @@ private lemma logx1_lt_44 : log Inputs.default.x₁ < 44 := by
   rw [h, Real.log_pow]; push_cast; linarith [LogTables.log_10_lt]
 
 private lemma row90_a1_le : Inputs.default.a₁ (90 : ℝ) ≤ (2 : ℝ) := by
-  rw [Inputs.a₁, if_neg (by linarith [logx1_lt_44] : ¬ ((90 : ℝ) ≤ 2 * log Inputs.default.x₁))]
+  rw [Inputs.a₁, ite_eq_right (by linarith [logx1_lt_44] : ¬ ((90 : ℝ) ≤ 2 * log Inputs.default.x₁))]
   have heps : Inputs.default.ε ((90 : ℝ) / 2) ≤ 1.0908e-8 := by
     change BKLNW_app.table_8_ε ((90 : ℝ) / 2) ≤ 1.0908e-8
     rw [show (90 : ℝ) / 2 = 45 by norm_num]
@@ -20,7 +20,7 @@ private lemma row90_a1_le : Inputs.default.a₁ (90 : ℝ) ≤ (2 : ℝ) := by
   linarith
 
 private lemma row95_a1_le : Inputs.default.a₁ (95 : ℝ) ≤ (2 : ℝ) := by
-  rw [Inputs.a₁, if_neg (by linarith [logx1_lt_44] : ¬ ((95 : ℝ) ≤ 2 * log Inputs.default.x₁))]
+  rw [Inputs.a₁, ite_eq_right (by linarith [logx1_lt_44] : ¬ ((95 : ℝ) ≤ 2 * log Inputs.default.x₁))]
   have heps : Inputs.default.ε ((95 : ℝ) / 2) ≤ 4.4013e-9 := by
     change BKLNW_app.table_8_ε ((95 : ℝ) / 2) ≤ 4.4013e-9
     rw [show (95 : ℝ) / 2 = 47.5 by norm_num]

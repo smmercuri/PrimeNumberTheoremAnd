@@ -12,6 +12,7 @@ public import PrimeNumberTheoremAnd.Mathlib.NumberTheory.LSeries.RiemannZeta
 public import PrimeNumberTheoremAnd.Mathlib.NumberTheory.LSeries.RiemannZetaAbelKernel
 public import PrimeNumberTheoremAnd.Mathlib.MeasureTheory.Integral.IntervalIntegral.Basic
 public import PrimeNumberTheoremAnd.Mathlib.MeasureTheory.Integral.IntegrableOn
+public import Mathlib.Analysis.PSeriesComplex
 public import Mathlib.Analysis.SpecialFunctions.Pow.Continuity
 
 /-!

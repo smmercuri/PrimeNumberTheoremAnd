@@ -29,7 +29,7 @@ theorem etheta_le_floor :
   have hNpos : 0 < N := by omega
   have himpl := checkAllThetaRelErrorReal_implies 2 22027 (4/5) 20 hcheck N hNpos hN2
     (by omega : N ≤ 22027)
-  rw [if_pos hNlim] at himpl
+  rw [ite_eq_left hNlim] at himpl
   have h := abs_theta_sub_le_mul_of_checkThetaRelErrorReal
     N 20 (4/5) (by norm_num) (by norm_num) himpl x hNlo hNhi
   have hcast : ((4/5 : ℚ) : ℝ) = (4/5 : ℝ) := by norm_num
